@@ -1,65 +1,71 @@
-import React, { useEffect, useState } from "react";
-import Form from "./components/Form";
-import TodoList from "./components/TodoList";
+import React, { useEffect, useRef, useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+
+import { userStore } from '@/store/userStore';
+import { shallow } from 'zustand/shallow';
+
+import Admin from '@/layouts/Admin';
+import Auth from '@/layouts/Auth';
+import setAuthToken from './utils/setAuthToken';
+
+import Login from '@/views/auth/Login';
+import Todo from '@/views/admin/Todo';
 
 function App() {
-  const [inputText, setInputText] = useState("");
-  const [todos, setTodos] = useState([]);
-  const [status,setStatus] = useState("all")
-  const [filteredTodos, setFilteredTodos] = useState([]);
+  const { token: isAuthenticated } = userStore(
+    (state) => ({
+      token: state.token,
+    }),
+    shallow
+  );
+
+  const isRunned = useRef(false);
+
+  if (isAuthenticated) {
+    setAuthToken(localStorage.token);
+  }
 
   useEffect(() => {
-    getLocalTodos();
-  }, []);
+    if (isRunned.current) return;
+    isRunned.current = true;
 
-  useEffect(() => {
-    filterHandler();
-    saveLocalTodos();
-  }, [todos, status]);
+  }, [isAuthenticated]);
 
-  const saveLocalTodos = () => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  };
-
-  const getLocalTodos = () => {
-    if (localStorage.getItem("todos") === null) {
-      localStorage.setItem("todos", JSON.stringify([]));
-    } else {
-      let todoLocal = JSON.parse(localStorage.getItem("todos"));
-      setTodos(todoLocal);
-    }
-  };
-
-  const filterHandler = () => {
-    switch (status) {
-      case "done":
-        setFilteredTodos(todos.filter((todo) => todo.completed === true));
-        break;
-      case "waiting":
-        setFilteredTodos(todos.filter((todo) => todo.completed === false));
-        break;
-      default:
-        setFilteredTodos(todos);
-        break;
-    }
-  };
   return (
-    <div className="h-screen w-screen flex bg-gradient-to-tr from-gray-200 via-gray-400 to-gray-500">
-      <div className="container bg-white rounded-xl mx-auto my-auto w-1/4 h-5/6 flex flex-col shadow-xl overflow-y-auto ">
-        <h2 className="text-4xl font-semibold	text-center flex mx-auto mt-4 mb-4 text-blue-400 header-font">
-          Bucket List
-        </h2>
-        <Form
-          inputText={inputText}
-          setInputText={setInputText}
-          setTodos={setTodos}
-          todos={todos}
-          setStatus={setStatus}
-        />
-        <TodoList todos={todos} setTodos={setTodos} filteredTodos={filteredTodos}/>
-      </div>
-    </div>
+    <Routes>
+      <>
+        <Route path="admin" element={<Admin />}>
+          <Route
+            path="todo"
+            element={
+              <ProtectedRoute>
+                <Todo />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+      </>
+      <Route path="auth" element={<Auth />}>
+        <Route path="login" element={<Login />} />
+      </Route>
+      <Route path="*" element={<MissingRoute />} />
+    </Routes>
   );
 }
+
+const ProtectedRoute = ({ roles, children }) => {
+  const token = userStore((state) => state.token);
+  const user = userStore((state) => state.user);
+  const isAuthenticated = token;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/login" replace />;
+  }
+  return children;
+};
+
+const MissingRoute = () => {
+  return <Navigate to={{ pathname: '/auth/login' }} />;
+};
 
 export default App;

@@ -21,23 +21,32 @@ function Form({ inputText, setInputText, setTodos, todos ,setStatus}) {
     setStatus(e.target.value)
   }
   return (
-    <div className="flex flex-col justify-center w-full mb-6 pb-6 border-b-2 border-gray-100 items-center bg-white  mx-auto ">
-      <form className="flex  rounded-2xl border-gray-100 border-2 ml-4 mr-4">
+    <div className="mx-auto mb-6 flex w-full flex-col items-center justify-center border-b-2 border-gray-100 bg-white  pb-6 ">
+      <form className="ml-4  mr-4 flex rounded-2xl border-2 border-gray-100">
         <input
-          className="w-full box-border outline-none bg-transparent text-gray-600 placeholder-gray-300 text-2xl mx-6 p-2"
+          className="w-full rounded border-0 bg-white px-3 py-3 text-sm text-gray-600 placeholder-gray-300 shadow transition-all duration-150 ease-linear focus:outline-none focus:ring"
           placeholder="New"
           onChange={inputTextHandler}
           value={inputText}
           type="text"
         />
-        <button onClick={clickHandler} className="outline-none">
-          <i className="fas fa-thumbtack text-blue-500 mr-4 text-lg outline-none outline-no"></i>
+        <button
+          onClick={clickHandler}
+          className="mx-2 rounded bg-indigo-500 px-4 py-2 text-xs font-bold uppercase text-white shadow outline-none transition-all duration-150 ease-linear hover:shadow-md focus:outline-none active:bg-indigo-600"
+        >
+          <i className="fas fa-save outline-no text-lg text-white outline-none"></i>
         </button>
       </form>
-      <div className="flex justify-evenly mt-6 w-full header-font text-gray-500">
-          <button onClick={statusHandler} value="all" className="">all</button>
-          <button onClick={statusHandler} value="done" className="">done</button>
-          <button onClick={statusHandler} value="waiting" className="">waiting</button>
+      <div className="header-font mt-6 flex w-full justify-evenly text-gray-500">
+        <button onClick={statusHandler} value="all" className="mr-1 rounded bg-blue-500 px-4 py-2 text-xs font-bold uppercase text-white shadow outline-none transition-all duration-150 ease-linear hover:shadow-md focus:outline-none active:bg-blue-600">
+          all
+        </button>
+        <button onClick={statusHandler} value="done" className="mr-1 rounded bg-green-500 px-4 py-2 text-xs font-bold uppercase text-white shadow outline-none transition-all duration-150 ease-linear hover:shadow-md focus:outline-none active:bg-green-600">
+          done
+        </button>
+        <button onClick={statusHandler} value="waiting" className="mr-1 rounded bg-red-500 px-4 py-2 text-xs font-bold uppercase text-white shadow outline-none transition-all duration-150 ease-linear hover:shadow-md focus:outline-none active:bg-red-600">
+          waiting
+        </button>
       </div>
     </div>
   );
